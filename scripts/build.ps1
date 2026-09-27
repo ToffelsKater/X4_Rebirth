@@ -6,7 +6,11 @@ $projectRoot = Split-Path $PSScriptRoot -Parent
 $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
 $vsPath = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
 if (-not $vsPath) { throw 'Visual Studio C++ x64 tools not found' }
-$cmake = Join-Path $vsPath 'Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe'
+$cmake = (Get-Command cmake.exe -ErrorAction Stop).Source
+$ctest = (Get-Command ctest.exe -ErrorAction Stop).Source
+
+Write-Host "CMake: $cmake"
+Write-Host "CTest: $ctest"
 $ctest = Join-Path (Split-Path $cmake) 'ctest.exe'
 & $cmake -S $projectRoot -B (Join-Path $projectRoot $BuildDirectory) -G 'Visual Studio 17 2022' -A x64
 if ($LASTEXITCODE -ne 0) { throw 'Configure failed' }
